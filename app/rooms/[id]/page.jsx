@@ -34,6 +34,8 @@ const RoomPage = async ({ params }) => {
             width={400}
             height={100}
             className="w-full sm:w-1/3 h-64 object-cover rounded-lg"
+            unoptimized
+
           />
 
           <div className="mt-4 sm:mt-0 sm:flex-1">

@@ -2,6 +2,7 @@
 import RoomCard from "@/components/RoomCard";
 import Heading from "@/components/Heading";
 import getAllRooms from "@/actions/getAllRooms";
+export const revalidate = 0;
 export default async function Home() {
   const rooms = await getAllRooms();
   return (
