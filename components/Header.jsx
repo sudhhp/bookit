@@ -20,8 +20,17 @@ import { FaBuildingCircleCheck } from "react-icons/fa6";
 import { BsBuildingFillCheck } from "react-icons/bs";
 import { RiAddLargeLine } from "react-icons/ri";
 import { Database } from "lucide-react";
-const Header = () => {
+import { FaLocationArrow } from "react-icons/fa6";
+const Header = ({ initialUser = null, initialIsAuthenticated = false }) => {
   const [date, setDate] = useState("");
+  const [user, setUser] = useState(initialUser);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser, initialIsAuthenticated]);
+
   useEffect(() => {
     const today = new Date();
     const options = {
@@ -31,14 +40,11 @@ const Header = () => {
       hour: "2-digit",
       minute: "2-digit",
     };
-    setDate(today.toLocaleDateString("fa-IR", options));
+    setDate(today.toLocaleString("fa-IR", options));
   }, []);
-  const router = useRouter();
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   const handleLogout = async () => {
     const { success, error } = await destroySession();
-
     if (success) {
       setIsAuthenticated(false);
       router.push("/login");
@@ -46,126 +52,159 @@ const Header = () => {
       toast.error(error);
     }
   };
-  return (
-    <>
-      <header className="bg-gray-100">
-        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/">
-                <Image
-                  className="h-12 w-12"
-                  src={logo}
-                  alt="Bookit"
-                  width={100}
-                  height={50}
-                />
-              </Link>
-              <p className="text-gray-500 px-2 mt-1 text-sm font-medium">
-                {date}
-              </p>
-              <FaCircle className="inline mr-1 text-xs text-gray-700" />
 
-              <div className="hidden md:block">
-                <div className="ml-3 flex items-baseline space-x-4">
-                  <Link href="/">
-                    <RiHome9Fill className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
-                  </Link>
-                  {/* <!-- Logged In Only --> */}
-                  {isAuthenticated && (
-                    <>
-                      <Link
-                        href="/bookings"
-                        // className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                      >
-                        <BsBuildingFillCheck className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
-                        رزرو
-                      </Link>
-                      <Link
-                        href="/rooms/add"
-                        // className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                      >
-                        <BsBuildingFillAdd className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
-                        اضافه کردن اتاق
-                      </Link>
-                    </>
-                  )}
+  return (
+    <nav className="bg-blue-50 border-gray-200 dark:bg-gray-900">
+      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          <ul>
+            <li>
+              <Link
+                href="/"
+                className="flex items-center space-x-1 rtl:space-x-reverse"
+              >
+                <Image src={logo} alt="Bookit" width={48} height={48} />
+                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+                  o o k i t
+                </span>
+              </Link>
+            </li>
+            <li>
+              <span className="text-gray-500 text-sm font-medium hidden md:block">
+                {date}
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          {/* User avatar */}
+          <div className="relative">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="group flex items-center transition-all"
+              >
+                {/* Arrow Icon */}
+                <FaLocationArrow
+                  className={`
+        size-5 mr-2 text-gray-500 transition-transform duration-300
+      
+        group-focus:rotate-90 group-focus:text-indigo-500
+        ${isUserMenuOpen ? "rotate-90 text-indigo-600" : ""}
+      `}
+                />
+
+                {/* Profile Image */}
+                <div className="relative">
+                  <Image
+                    className="w-10 h-10 rounded-full shadow-2xl ring-2 ring-transparent group-hover:ring-indigo-400 group-focus:ring-indigo-500 transition-all"
+                    src="/images/profile-picture-4.jpg"
+                    alt="user photo"
+                    width={40}
+                    height={40}
+                  />
+                  {/* Optional glowing effect */}
+                  <span
+                    className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
+                      isUserMenuOpen
+                        ? "ring-2 ring-indigo-400 opacity-100"
+                        : "opacity-0"
+                    }`}
+                  />
                 </div>
-              </div>
-            </div>
-            {/* <!-- Right Side Menu --> */}
-            <div className="ml-auto">
-              <div className="ml-4 flex items-center md:ml-6">
-                {/* <!-- Logged Out Only --> */}
-                {!isAuthenticated && (
-                  <>
+              </button>
+            )}
+
+            {!isAuthenticated && (
+              <>
+                <ul className="py-2 flex">
+                  <li>
+                    {" "}
                     <Link
                       href="/login"
-                      className="mr-3 text-gray-800 hover:text-gray-600"
+                      className="block px-1 text-sm text-gray-800 hover:text-gray-600"
                     >
                       <RiLoginCircleFill className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
                       ورود
                     </Link>
+                  </li>
+                  <li>
                     <Link
                       href="/register"
-                      // className="mr-3 text-gray-800 hover:text-gray-600"
+                      className="block px-1 text-sm text-gray-800 hover:text-gray-600"
                     >
                       <RiUser6Fill className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
                       ثبت نام
                     </Link>
-                  </>
-                )}
-                {isAuthenticated && (
-                  <>
-                    <Link href="/rooms/my">
+                  </li>
+                </ul>
+              </>
+            )}
+            {/* User dropdown */}
+            {isUserMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 z-50 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600">
+                <div className="px-4 py-3">
+                  <span className="block text-sm text-gray-900 dark:text-white">
+                    {user.name}
+                  </span>
+                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                    {user.email}
+                  </span>
+                </div>
+                <ul className="py-2">
+                  <li>
+                    <Link
+                      href="/rooms/add"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200"
+                    >
+                      <BsBuildingFillAdd className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
+                      اضافه کردن اتاق
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/bookings"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200"
+                    >
+                      <BsBuildingFillCheck className="inline mr-1 text-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
+                      رزرو
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/rooms/my"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200"
+                    >
                       <FaBuilding className="inline mr-1 t0ext-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
                       اتاق
                     </Link>
+                  </li>
+                  <li>
                     <button
-                      onClick={handleLogout}
-                      className="mx-3 text-gray-800 hover:text-gray-600"
+                      onClick={() => {
+                        handleLogout();
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200"
                     >
                       <RiLogoutCircleLine className="inline mr-1 t0ext-gray-700 text-2xl hover:text-2xl hover:text-gray-300" />
                       خروج
                     </button>
-                  </>
-                )}
+                  </li>
+                </ul>
               </div>
-            </div>
-          </div>
-        </nav>
-
-        {/* <!-- Mobile menu --> */}
-        <div className="md:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            <Link
-              href="/"
-              className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-            >
-              <RiHome9Fill className="inline mr-1 text-gray-700" />
-              اتاق ها
-            </Link>
-            {isAuthenticated && (
-              <>
-                <Link
-                  href="/bookings"
-                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                >
-                  رزرو
-                </Link>
-                <Link
-                  href="/rooms/add"
-                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white"
-                >
-                  اضافه کردن اتاق
-                </Link>
-              </>
             )}
-            {/* <!-- Logged In Only --> */}
           </div>
         </div>
-      </header>
-    </>
+      </div>
+    </nav>
   );
 };
+
 export default Header;

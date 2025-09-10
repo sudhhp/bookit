@@ -4,26 +4,35 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthWrapper from "@/components/AuthWrapper";
 import { ToastContainer } from "react-toastify";
+import checkAuth from "@/actions/checkAuth";
+
 const vazirmatn = Vazirmatn({
   subsets: ["latin", "arabic"],
 });
+
 export const metadata = {
   title: "BookIT App",
-  description: "BookIT|BOOK A Meeting Or Confrence Room For Your Team",
+  description: "BookIT | BOOK A Meeting Or Conference Room For Your Team",
 };
-export default function RootLayout({ children }) {
+
+export default async function RootLayout({ children }) {
+  const auth = await checkAuth();
+
   return (
-    <AuthWrapper>
-      <html lang="en">
-        <body className={vazirmatn.className}>
-          <Header />
+    <html lang="en">
+      <body className={vazirmatn.className}>
+        <AuthWrapper>
+          <Header
+            initialUser={auth.user ?? null}
+            initialIsAuthenticated={auth.isAuthenticated ?? false}
+          />
           <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </main>
           <Footer />
           <ToastContainer />
-        </body>
-      </html>
-    </AuthWrapper>
+        </AuthWrapper>
+      </body>
+    </html>
   );
 }
